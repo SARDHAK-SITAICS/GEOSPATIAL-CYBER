@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>GeoCyber Sentinel</title>
+
+  <!-- Leaflet CSS & JS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet" />
+  
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- Top bar with logos -->
+  <div class="topbar">
+    <img src="https://rru.ac.in/wp-content/uploads/2021/09/SITAICS-Logo_Page_1_Image_0001.png" alt="SITAICS Logo" class="logo" />
+    <img src="https://isacfoundation.org/wp-content/uploads/2021/07/RRU-Logo.png" alt="RRU Logo" class="logo" />
+  </div>
+
+  <!-- Page title -->
+  <header>
+    <h1>Using GIS, AI, and Cybersecurity to Trace and Prevent Cyber Threat Actors</h1>
+  </header>
+
+  <main>
+    <section class="map-section">
+      <h2>Real-Time GIS Threat Map</h2>
+      <div id="map"></div>
+    </section>
+
+    <aside class="sidebar">
+      <section class="panel">
+        <h3>Threat Intelligence</h3>
+        <div id="threat-info">
+          <p><strong>Actor:</strong> APT28 (Fancy Bear)</p>
+          <p><strong>Location:</strong> Moscow, Russia</p>
+          <p><strong>Confidence:</strong> 91%</p>
+        </div>
+      </section>
+
+      <section class="panel chart-panel">
+        <h3>Threat Activity</h3>
+        <canvas id="threatChart"></canvas>
+      </section>
+
+      <section class="panel action-panel">
+        <h3>Response Actions</h3>
+        <button id="btnDisableC2">Disable C2 Server</button>
+        <button id="btnBlackholeIP" class="kinetic">Blackhole IP</button>
+      </section>
+    </aside>
+  </main>
+
+  <footer>
+    DONE BY SARDHAK-SITAICS
+  </footer>
+
+  <script>
+    // Map initialization
+    const map = L.map('map').setView([20, 0], 2);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 18,
+      attribution: '© OpenStreetMap contributors',
+    }).addTo(map);
+
+    // Marker
+    const threatMarker = L.marker([55.751244, 37.618423]).addTo(map);
+    threatMarker.bindPopup('<b>APT28</b><br>Moscow');
+
+    // Chart
+    const ctx = document.getElementById('threatChart').getContext('2d');
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+        datasets: [{
+          label: 'Threats Detected',
+          data: [5, 9, 7, 14, 18, 22, 30],
+          borderColor: '#e03e2f',
+          backgroundColor: 'rgba(224, 62, 47, 0.25)',
+          tension: 0.4,
+          fill: true
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            labels: { color: '#fff' }
+          }
+        },
+        scales: {
+          x: { ticks: { color: '#ccc' }, grid: { color: '#333' } },
+          y: { ticks: { color: '#ccc' }, grid: { color: '#333' } }
+        }
+      }
+    });
+
+    // Actions
+    document.getElementById('btnDisableC2').addEventListener('click', () => {
+      alert('C2 Server Disabled.');
+    });
+    document.getElementById('btnBlackholeIP').addEventListener('click', () => {
+      alert('Malicious IP Blackholed.');
+    });
+  </script>
+</body>
+</html>
