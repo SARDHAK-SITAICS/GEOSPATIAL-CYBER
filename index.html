@@ -39,9 +39,7 @@
       <section class="panel">
         <h3>Threat Intelligence</h3>
         <div id="threat-info">
-          <p><strong>Actor:</strong> APT28 (Fancy Bear)</p>
-          <p><strong>Location:</strong> Moscow, Russia</p>
-          <p><strong>Confidence:</strong> 91%</p>
+          <!-- Info gets updated dynamically -->
         </div>
       </section>
 
@@ -63,26 +61,77 @@
   </footer>
 
   <script>
-    // Map initialization
+    // Initialize map
     const map = L.map('map').setView([20, 0], 2);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 18,
       attribution: '© OpenStreetMap contributors',
     }).addTo(map);
 
-    // Marker
-    const threatMarker = L.marker([55.751244, 37.618423]).addTo(map);
-    threatMarker.bindPopup('<b>APT28</b><br>Moscow');
+    // Threat data including activity for chart (monthly threats)
+    const threats = [
+      {
+        location: [55.751244, 37.618423],
+        place: 'Moscow, Russia',
+        actor: 'APT28 (Fancy Bear)',
+        confidence: '91%',
+        description: 'Advanced persistent threat group linked to Russian intelligence.',
+        activity: [5, 9, 7, 14, 18, 22, 30]
+      },
+      {
+        location: [28.613939, 77.209023],
+        place: 'New Delhi, India',
+        actor: 'OceanLotus',
+        confidence: '85%',
+        description: 'Cyber espionage group targeting Southeast Asia and India.',
+        activity: [3, 6, 5, 8, 11, 14, 20]
+      },
+      {
+        location: [38.9072, -77.0369],
+        place: 'Washington D.C., USA',
+        actor: 'APT29 (Cozy Bear)',
+        confidence: '89%',
+        description: 'Russian hacking group known for espionage on US government.',
+        activity: [6, 10, 8, 15, 21, 26, 35]
+      },
+      {
+        location: [9.1021, 18.2812],
+        place: 'Africa',
+        actor: 'SilverTerrier',
+        confidence: '75%',
+        description: 'Cybercrime group involved in business email compromise attacks.',
+        activity: [2, 4, 6, 7, 9, 11, 13]
+      },
+      {
+        location: [48.8566, 2.3522],
+        place: 'Paris, Europe',
+        actor: 'Turla',
+        confidence: '88%',
+        description: 'Russian cyber espionage group active in Europe.',
+        activity: [4, 8, 9, 13, 16, 19, 25]
+      },
+      {
+        location: [39.9042, 116.4074],
+        place: 'Beijing, China',
+        actor: 'APT41',
+        confidence: '92%',
+        description: 'Chinese state-sponsored threat actor with broad targeting scope.',
+        activity: [7, 11, 10, 17, 23, 27, 40]
+      }
+    ];
 
-    // Chart
+    // Sidebar element references
+    const threatInfoDiv = document.getElementById('threat-info');
     const ctx = document.getElementById('threatChart').getContext('2d');
-    new Chart(ctx, {
+
+    // Initialize Chart.js chart
+    let threatChart = new Chart(ctx, {
       type: 'line',
       data: {
         labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
         datasets: [{
           label: 'Threats Detected',
-          data: [5, 9, 7, 14, 18, 22, 30],
+          data: [], // Will fill later
           borderColor: '#e03e2f',
           backgroundColor: 'rgba(224, 62, 47, 0.25)',
           tension: 0.4,
@@ -92,9 +141,7 @@
       options: {
         responsive: true,
         plugins: {
-          legend: {
-            labels: { color: '#fff' }
-          }
+          legend: { labels: { color: '#fff' } }
         },
         scales: {
           x: { ticks: { color: '#ccc' }, grid: { color: '#333' } },
@@ -103,7 +150,37 @@
       }
     });
 
-    // Actions
+    // Function to update threat info text
+    function updateThreatInfo(data) {
+      threatInfoDiv.innerHTML = `
+        <p><strong>Actor:</strong> ${data.actor}</p>
+        <p><strong>Location:</strong> ${data.place}</p>
+        <p><strong>Confidence:</strong> ${data.confidence}</p>
+        <p>${data.description}</p>
+      `;
+    }
+
+    // Function to update chart data
+    function updateChart(activity) {
+      threatChart.data.datasets[0].data = activity;
+      threatChart.update();
+    }
+
+    // Add markers and bind popup + click for updates
+    threats.forEach(threat => {
+      const marker = L.marker(threat.location).addTo(map);
+      marker.bindPopup(`<b>${threat.actor}</b><br>${threat.place}`);
+      marker.on('click', () => {
+        updateThreatInfo(threat);
+        updateChart(threat.activity);
+      });
+    });
+
+    // Initialize with first threat data
+    updateThreatInfo(threats[0]);
+    updateChart(threats[0].activity);
+
+    // Response buttons actions
     document.getElementById('btnDisableC2').addEventListener('click', () => {
       alert('C2 Server Disabled.');
     });
